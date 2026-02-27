@@ -1,0 +1,32 @@
+El Problema:
+Quieres segmentar datos sin etiquetas usando KMeans, pero no sabes cuántos clusters elegir. Vas a evaluar varios valores de K y escoger el mejor según silhouette score.
+
+Tu Misión:
+Escribe una función llamada mejor_k_kmeans(X, k_values, random_state=42) que:
+
+1. Reciba:
+   - X: np.ndarray de forma (n_samples, n_features) con datos numéricos.
+   - k_values: lista de enteros candidatos para K (por ejemplo [2,3,4,5,6]).
+   - random_state: entero para reproducibilidad.
+
+2. Estandarice X con StandardScaler (fit_transform sobre todo X).
+
+3. Para cada k en k_values:
+   - Entrene KMeans(n_clusters=k, random_state=random_state, n_init=10)
+   - Obtenga etiquetas
+   - Calcule silhouette_score sobre los datos escalados
+
+4. Escoja el k con mayor silhouette score.
+   - Si hay empate, elija el k más pequeño.
+
+5. Devuelva un diccionario con:
+   - "best_k": el mejor k (int)
+   - "best_score": su silhouette score (float)
+   - "scores": diccionario {k: score} para todos los k probados
+
+Restricciones:
+- k_values solo contendrá valores >= 2.
+- Librerías permitidas: numpy, sklearn.
+
+Retorno:
+Un dict con "best_k", "best_score" y "scores".

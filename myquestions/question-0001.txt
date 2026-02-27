@@ -1,0 +1,34 @@
+El Problema:
+Una IPS quiere detectar problemas de agenda cuando un mismo paciente tiene citas que se traslapan (se cruzan en el tiempo). Tienes un DataFrame de citas con fecha, hora de inicio y duración.
+
+Tu Misión:
+Escribe una función llamada detectar_solapamientos(df, paciente_col, fecha_col, hora_inicio_col, duracion_min_col) que haga lo siguiente:
+
+1. Reciba un pd.DataFrame df con las columnas:
+   - paciente_col: identificador del paciente (string o int)
+   - fecha_col: fecha de la cita (string YYYY-MM-DD o datetime)
+   - hora_inicio_col: hora de inicio (string HH:MM)
+   - duracion_min_col: duración en minutos (int)
+
+2. Convierta fecha_col a datetime si hace falta y construya una columna datetime completa inicio_dt combinando fecha + hora.
+
+3. Calcule fin_dt = inicio_dt + duración (en minutos).
+
+4. Ordene las citas por paciente y por inicio_dt.
+
+5. Marque un solapamiento cuando una cita comienza antes de que termine la cita anterior del mismo paciente:
+   solapada = inicio_dt < fin_dt_anterior (para el mismo paciente)
+
+6. Devuelva un nuevo DataFrame con las mismas columnas originales más:
+   - inicio_dt (datetime)
+   - fin_dt (datetime)
+   - solapada (bool)
+
+7. El DataFrame retornado debe quedar ordenado por paciente_col, inicio_dt ascendente, con índice reiniciado.
+
+Restricciones:
+- Librerías permitidas: pandas, numpy.
+- Evita loops explícitos por filas (usa operaciones vectorizadas / shift por grupo).
+
+Retorno:
+Un pd.DataFrame con las columnas originales + inicio_dt, fin_dt, solapada.

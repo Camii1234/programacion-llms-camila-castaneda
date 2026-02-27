@@ -1,0 +1,32 @@
+El Problema:
+En clasificación binaria, usar umbral 0.5 no siempre es lo mejor. Quieres encontrar el umbral que maximiza el F1-score usando las probabilidades predichas por un modelo.
+
+Tu Misión:
+Escribe una función llamada mejor_umbral_f1(y_true, y_proba, step=0.01) que:
+
+1. Reciba:
+   - y_true: array-like (lista o np.ndarray) con etiquetas reales (0 o 1)
+   - y_proba: array-like con probabilidades predichas para clase 1 (valores entre 0 y 1)
+   - step: tamaño del paso para probar umbrales (float), por defecto 0.01
+
+2. Genere una lista de umbrales desde 0.0 hasta 1.0 (inclusive) usando step.
+
+3. Para cada umbral t, convierta probabilidades a clases:
+   y_pred = (y_proba >= t).astype(int)
+
+4. Calcule el f1_score para cada umbral usando sklearn.metrics.f1_score con zero_division=0.
+
+5. Seleccione el umbral con mayor F1.
+   - Si hay empate, elija el umbral más pequeño.
+
+6. Devuelva un diccionario con:
+   - "best_threshold": umbral óptimo (float)
+   - "best_f1": F1 máximo (float)
+   - "support_positive": número de positivos reales en y_true (int)
+
+Restricciones:
+- Librerías permitidas: numpy, sklearn.
+- No entrenas modelos aquí: solo trabajas con y_true y y_proba.
+
+Retorno:
+Un dict con las tres claves descritas.

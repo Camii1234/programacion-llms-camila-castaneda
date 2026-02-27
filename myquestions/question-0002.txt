@@ -1,0 +1,34 @@
+El Problema:
+En analítica de uso de una app, quieres modelar cómo los usuarios se mueven entre pantallas (Home → Producto → Carrito → Pago). Te dan un DataFrame con eventos por usuario en orden temporal y necesitas construir una matriz de transición (probabilidades de pasar de una pantalla a otra).
+
+Tu Misión:
+Escribe una función llamada matriz_transicion(df, user_col, time_col, state_col) que:
+
+1. Reciba un pd.DataFrame df con:
+   - user_col: id de usuario
+   - time_col: timestamp del evento (string o datetime)
+   - state_col: nombre del estado/pantalla (string)
+
+2. Convierta time_col a datetime si hace falta.
+
+3. Ordene por user_col y time_col ascendente.
+
+4. Para cada usuario, obtenga el siguiente estado con un shift (next_state).
+
+5. Cuente transiciones state_col -> next_state ignorando las filas donde next_state sea nulo (último evento de cada usuario).
+
+6. Con esos conteos, construya un DataFrame donde:
+   - Filas = estado actual
+   - Columnas = siguiente estado
+   - Valores = probabilidad de transición (cada fila debe sumar 1.0)
+
+7. Cualquier transición inexistente debe tener 0.0.
+
+8. Ordene filas y columnas alfabéticamente por el nombre del estado.
+
+Restricciones:
+- Librerías permitidas: pandas, numpy.
+- Sin loops por filas.
+
+Retorno:
+Un pd.DataFrame cuadrado de probabilidades (float) con índices y columnas como estados.
