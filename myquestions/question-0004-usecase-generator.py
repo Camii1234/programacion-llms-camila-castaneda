@@ -58,6 +58,7 @@ def generar_caso_de_uso_mejor_k_kmeans():
     k_max = min(10, max(6, true_k + 4))  # hasta 10, pero al menos 6 o true_k+4
 
     k_candidates = np.arange(k_min, k_max + 1, dtype=int)
+    num_k = min(num_k, len(k_candidates))
     k_values = rng.choice(k_candidates, size=num_k, replace=False)
     k_values = sorted(int(k) for k in k_values)
 
