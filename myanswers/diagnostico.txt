@@ -1,0 +1,291 @@
+DIAGNÓSTICO DE VALIDACIÓN - FASE 2
+=================================
+
+Estudiante: María Camila Castañeda Piedrahita
+Repositorio: https://github.com/Camii1234/programacion-llms-camila-castaneda.git
+
+Resumen general
+---------------
+Tras revisar las soluciones implementadas, los generadores originales asignados y el comportamiento del autocalificador en Colab, concluyo que mis archivos `answer-*.py` no presentan errores de sintaxis ni errores de importación.
+
+Los archivos entregados son:
+
+- myanswers/answer-0166.py
+- myanswers/answer-0464.py
+- myanswers/answer-0327.py
+- myanswers/answer-0210.py
+
+Cada archivo contiene la función correspondiente al ID asignado y los imports necesarios dentro del mismo archivo, tal como se requiere para que se ejecuten en un entorno aislado.
+
+El problema observado en el autocalificador no corresponde a una ausencia de implementación ni a un error de ejecución interno de mis soluciones, sino a inconsistencias entre algunos generadores originales de caso de uso y los enunciados que esos mismos generadores deberían validar.
+
+Resultado observado en el autocalificador
+-----------------------------------------
+Al ejecutar el autocalificador del profesor en Colab con el repositorio:
+
+https://github.com/Camii1234/programacion-llms-camila-castaneda.git
+
+se observa lo siguiente:
+
+- La pregunta 0166 se evalúa correctamente.
+- El autocalificador muestra:
+
+[RESULT] 0166: ✓ output matches
+
+Luego, el validador intenta evaluar la pregunta 0210 y se detiene con el siguiente error:
+
+ValueError: The truth value of a DataFrame is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+
+Este error ocurre durante la comparación entre el resultado esperado del generador y el resultado real de mi función, no durante la ejecución directa de mi función.
+
+Estado por ID
+-------------
+
+0166: correcto
+---------------
+
+Archivo:
+myanswers/answer-0166.py
+
+Función:
+calcular_curva_roc(y_true, y_scores)
+
+Estado:
+Correcto. El autocalificador confirma que el output coincide.
+
+Justificación:
+La solución implementa la función `calcular_curva_roc(y_true, y_scores)` y retorna exactamente una tupla con:
+
+- fpr
+- tpr
+- auc
+
+Esto coincide con el enunciado original, que pide calcular la curva ROC usando `roc_curve` y calcular el AUC usando `roc_auc_score`.
+
+También coincide con el generador original de la pregunta 0002 de VSofia-1, ya que dicho generador construye un diccionario de entrada con las claves:
+
+- y_true
+- y_scores
+
+y una salida esperada con la forma:
+
+(fpr, tpr, auc)
+
+Por lo tanto, esta solución es compatible tanto con el enunciado como con el generador.
+
+Referencias:
+- myanswers/answer-0166.py, líneas 1-11.
+- Generador original question-0002-usecase-generator.py de VSofia-1, donde se arma `input = {"y_true": y_true, "y_scores": y_scores}` y `output = (fpr, tpr, auc)`.
+- Enunciado original question-0002.txt de VSofia-1, donde se pide devolver FPR, TPR y AUC.
+
+0464: esperado correcto
+-----------------------
+
+Archivo:
+myanswers/answer-0464.py
+
+Función:
+resumir_por_grupo_y_normalizar(df, columna_grupo, columna_valor)
+
+Estado:
+Esperado como correcto. El autocalificador no alcanza a evaluarlo porque se detiene antes en 0210.
+
+Justificación:
+La solución implementa la función `resumir_por_grupo_y_normalizar(df, columna_grupo, columna_valor)` y realiza exactamente las operaciones pedidas:
+
+1. Agrupa el DataFrame por `columna_grupo`.
+2. Calcula `sum`, `mean` y `std` sobre `columna_valor`.
+3. Reinicia el índice.
+4. Crea la columna `indice_normalizado` dividiendo la media de cada grupo entre la media máxima.
+5. Retorna el DataFrame resumen.
+
+Esta lógica coincide con el generador original de Isaac Mesa Gómez, porque allí también se calcula:
+
+resumen = df.groupby(columna_grupo)[columna_valor].agg(["sum", "mean", "std"]).reset_index()
+resumen["indice_normalizado"] = resumen["mean"] / resumen["mean"].max()
+
+Por lo tanto, no se identifica una incompatibilidad entre el enunciado, el generador y mi solución.
+
+Referencias:
+- myanswers/answer-0464.py, líneas 1-14.
+- Generador original question-0004-usecase-generator.py de Isaac Mesa Gómez, donde se calcula el resumen agrupado y el índice normalizado.
+- Enunciado original question-0004.txt de Isaac Mesa Gómez, donde se pide agrupar, calcular suma, media, desviación estándar e índice normalizado.
+
+0327: posible fallo por inconsistencia del generador original
+-------------------------------------------------------------
+
+Archivo:
+myanswers/answer-0327.py
+
+Función:
+clasificar_tickets_soporte(textos, etiquetas, nuevo_mensaje)
+
+Estado:
+La solución está implementada según el enunciado, pero el generador original no permite validarla automáticamente de forma estándar.
+
+Justificación:
+El enunciado original solicita implementar una función llamada:
+
+clasificar_tickets_soporte(textos, etiquetas, nuevo_mensaje)
+
+con los siguientes argumentos:
+
+- textos: lista de mensajes de entrenamiento.
+- etiquetas: categorías asociadas a cada mensaje.
+- nuevo_mensaje: mensaje nuevo que se desea clasificar.
+
+También solicita que la función retorne un `numpy.ndarray` con la predicción de la categoría para `nuevo_mensaje`.
+
+Mi solución sigue exactamente esa especificación:
+
+1. Crea un `TfidfVectorizer`.
+2. Ajusta el vectorizador con los textos de entrenamiento.
+3. Entrena un modelo `MultinomialNB`.
+4. Transforma el nuevo mensaje.
+5. Retorna la predicción mediante `modelo.predict(X_nuevo)`.
+
+El problema no está en la función solución, sino en el generador original de Alejandro. Ese generador sí define internamente las variables `textos`, `etiquetas` y `nuevo_mensaje`, pero no las retorna como diccionario de entrada para llamar a la función solución.
+
+En lugar de retornar algo como:
+
+{
+	"textos": textos,
+	"etiquetas": etiquetas,
+	"nuevo_mensaje": nuevo_mensaje
+}
+
+el generador retorna:
+
+resultado_dict = {
+	"mensaje": nuevo_mensaje,
+	"categoria_predicha": prediccion
+}
+
+return resultado_dict, probabilidades.tolist()
+
+Esto genera dos incompatibilidades:
+
+1. El primer elemento retornado por el generador no contiene las claves que espera la función del enunciado.
+   El autocalificador llama la solución con:
+
+   ans_funcs[0](**kwargs)
+
+   Por lo tanto, intentaría llamar algo equivalente a:
+
+   clasificar_tickets_soporte(mensaje=..., categoria_predicha=...)
+
+   pero la firma correcta de la función es:
+
+   clasificar_tickets_soporte(textos, etiquetas, nuevo_mensaje)
+
+2. El segundo elemento retornado por el generador tampoco corresponde al retorno pedido en el enunciado.
+   El enunciado pide un `numpy.ndarray` con la predicción, pero el generador retorna una lista de probabilidades.
+
+Conclusión para 0327:
+La solución implementada está alineada con el enunciado original, pero el generador de caso de uso no permite validar automáticamente la función usando la firma y el retorno solicitados en la pregunta.
+
+Referencias:
+- myanswers/answer-0327.py, líneas 1-14.
+- Generador original question-0003-usecase-generator.py de Alejandro, donde se crean `textos`, `etiquetas` y `nuevo_mensaje`, pero se retorna `resultado_dict` y `probabilidades.tolist()`.
+- Enunciado original question-0003.txt de Alejandro, donde se pide explícitamente la función `clasificar_tickets_soporte(textos, etiquetas, nuevo_mensaje)` y un retorno tipo `numpy.ndarray`.
+
+0210: fallo por inconsistencia del generador original y por comparación del autocalificador
+------------------------------------------------------------------------------------------
+
+Archivo:
+myanswers/answer-0210.py
+
+Función:
+detectar_outliers(df)
+
+Estado:
+La solución está implementada según el enunciado, pero el autocalificador se detiene por una inconsistencia del generador original.
+
+Justificación:
+El enunciado original solicita implementar una función llamada:
+
+detectar_outliers(df)
+
+La función debe:
+
+1. Recibir un DataFrame con una columna `valores`.
+2. Calcular Q1.
+3. Calcular Q3.
+4. Calcular el rango intercuartílico IQR.
+5. Identificar valores menores que Q1 - 1.5 * IQR o mayores que Q3 + 1.5 * IQR.
+6. Retornar un DataFrame con únicamente las filas consideradas outliers.
+
+Mi solución implementa exactamente esa lógica:
+
+- Calcula Q1 con `df["valores"].quantile(0.25)`.
+- Calcula Q3 con `df["valores"].quantile(0.75)`.
+- Calcula `iqr = q3 - q1`.
+- Define los límites inferior y superior.
+- Filtra el DataFrame.
+- Retorna el DataFrame de outliers.
+
+El problema aparece en el generador original de Valentina Garro, porque retorna:
+
+return {"df": df}, None
+
+Esto significa que, para el autocalificador:
+
+- kwargs = {"df": df}
+- expected_val = None
+
+Cuando el autocalificador ejecuta mi solución, obtiene:
+
+actual_val = detectar_outliers(df)
+
+Ese `actual_val` es un DataFrame, porque eso es precisamente lo que pide el enunciado.
+
+Luego el autocalificador intenta comparar:
+
+compare_outputs(expected_val, actual_val)
+
+Es decir, intenta comparar:
+
+compare_outputs(None, DataFrame)
+
+Como el comparador no tiene un caso especial para `expected_val = None` frente a `actual_val = DataFrame`, cae al bloque final de comparación, donde evalúa algo equivalente a:
+
+if expected != actual:
+
+En este caso, eso equivale a:
+
+if None != DataFrame
+
+En pandas, esa comparación no produce un único booleano, sino una estructura ambigua. Por eso se lanza el error:
+
+ValueError: The truth value of a DataFrame is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+
+Conclusión para 0210:
+La función solución es coherente con el enunciado original, pero el generador no proporciona un output esperado válido para comparar automáticamente. El error del autocalificador se produce porque el generador retorna `None` como salida esperada, aunque el enunciado pide retornar un DataFrame.
+
+Referencias:
+- myanswers/answer-0210.py, líneas 1-16.
+- Generador original question-0002-usecase-generator.py de Valentina Garro, donde se construye el DataFrame y se retorna `return {"df": df}, None`.
+- Enunciado original question-0002.txt de Valentina Garro, donde se solicita devolver un DataFrame que contenga únicamente las filas outliers.
+- Autocalificador compartido por el profesor, especialmente la parte donde llama `actual_val = ans_funcs[0](**kwargs)` y luego compara con `compare_outputs(expected_val, actual_val)`.
+
+Impacto del error 0210 sobre la validación completa
+---------------------------------------------------
+El error de 0210 hace que el autocalificador se detenga antes de continuar con las demás preguntas. Por eso, aunque `0464` está alineado con su generador y debería pasar, el Colab no alcanza a evaluarlo si primero se encuentra con la pregunta 0210.
+
+Este comportamiento no implica que las demás soluciones estén incorrectas. Indica que el proceso de validación se interrumpe por una excepción generada durante la comparación del caso 0210.
+
+Sobre modificar las soluciones
+------------------------------
+No considero correcto modificar `answer-0210.py` para que retorne `None`, porque eso haría que la función contradiga el enunciado original. El enunciado pide devolver un DataFrame con outliers.
+
+Tampoco considero correcto modificar `answer-0327.py` para recibir argumentos como `mensaje` o `categoria_predicha`, porque esos no son los argumentos definidos en la pregunta original. El enunciado pide recibir `textos`, `etiquetas` y `nuevo_mensaje`.
+
+Por lo tanto, cambiar las soluciones para adaptarlas a generadores mal estructurados podría hacer que pasen una validación artificial, pero las volvería incorrectas frente a los enunciados.
+
+Conclusión final
+----------------
+Las soluciones fueron implementadas siguiendo los enunciados originales y con los imports necesarios dentro de cada archivo. El fallo observado en el autocalificador se debe principalmente a una inconsistencia del generador 0210, que retorna `None` como salida esperada, aunque el enunciado pide retornar un DataFrame.
+
+Además, la pregunta 0327 presenta otra inconsistencia: el generador no retorna los argumentos requeridos por la función del enunciado y retorna probabilidades en lugar de la predicción solicitada.
+
+Por estos motivos, considero que los posibles errores de validación en 0210 y 0327 son externos a mis soluciones y corresponden a inconsistencias en los generadores originales de caso de uso.
